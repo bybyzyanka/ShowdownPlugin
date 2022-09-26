@@ -8,6 +8,8 @@ public enum ShowdownMessage {
 
     JOIN(ChatColor.GREEN + "[Showdown] Вы присоединились к ШД!"),
 
+    CONTAINS_IMPERMISSIBLE_SYMBOLS(ChatColor.RED + "[Showdown] Название содержит запрещенные символы!"),
+
     NOT_ENOUGH_MONEY(ChatColor.RED + "[Showdown] Недостаточно денег!"),
 
     KIT_ALREADY_EXISTS(ChatColor.RED + "[Showdown] Кит с таким именем уже существует!"),
@@ -54,7 +56,7 @@ public enum ShowdownMessage {
     HELP_7(ChatColor.LIGHT_PURPLE + "ПРИМЕЧАНИЕ: Карта не будет считаться играбельной до " +
             "установки всех 10-ти точек спавна и 2-х точек границ");
 
-    private String message;
+    private final String message;
 
     ShowdownMessage(String message) { this.message = message; }
 

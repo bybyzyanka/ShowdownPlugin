@@ -13,6 +13,12 @@ public class ShowdownCreateKitCommand implements ShowdownCommand {
     public boolean execute(Player sender, String[] args)
     {
         String name = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
+        if(name.contains(".") || name.contains(":") || name.contains("/") || name.contains("\\"))
+        {
+            sender.sendMessage(ShowdownMessage.CONTAINS_IMPERMISSIBLE_SYMBOLS.toString());
+            return true;
+        }
+
         if(ShowdownManager.getKits().stream().anyMatch(kit -> kit.getName().equalsIgnoreCase(name)))
         {
             sender.sendMessage(ShowdownMessage.KIT_ALREADY_EXISTS.toString());
