@@ -60,7 +60,8 @@ public class ShowdownListener implements Listener {
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent event)
     {
-        if(ShowdownManager.getMap(event.getPlayer().getName()) != null)
+        ShowdownMap map = ShowdownManager.getMap(event.getPlayer().getName());
+        if(map != null && map.getStatus() == ShowdownStatus.STARTED)
         {
             event.getPlayer().sendMessage(ShowdownMessage.CANT_USE_COMMANDS.toString());
             event.setCancelled(true);

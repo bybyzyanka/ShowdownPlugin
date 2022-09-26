@@ -14,7 +14,7 @@ public class ShowdownSetSpawnpointCommand extends ShowdownSetCommand {
         if(index < 1 || index > 10)
             return false;
 
-        map.getSpawnPoints().setSpawnpoint(index, sender.getLocation());
+        map.getSpawnPoints().setSpawnPoint(index, sender.getLocation());
         sender.sendMessage(ShowdownMessage.SUCCESS.toString());
         return true;
     }

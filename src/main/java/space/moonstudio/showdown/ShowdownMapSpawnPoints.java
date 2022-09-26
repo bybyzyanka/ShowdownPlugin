@@ -13,7 +13,7 @@ public class ShowdownMapSpawnPoints extends ShowdownMapLocations {
 
     public ShowdownMapSpawnPoints(ShowdownMap map) { super(map); }
 
-    public void setSpawnpoint(int index, Location location)
+    public void setSpawnPoint(int index, Location location)
     {
         index -= 1;
         if(index >= spawnPoints.size())

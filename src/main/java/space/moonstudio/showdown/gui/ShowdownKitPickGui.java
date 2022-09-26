@@ -6,6 +6,7 @@ import space.moonstudio.showdown.ShowdownGuiTitle;
 import space.moonstudio.showdown.ShowdownKit;
 import space.moonstudio.showdown.ShowdownMap;
 import space.moonstudio.showdown.ShowdownManager;
+import space.moonstudio.showdown.player.PlayerConfig;
 import space.moonstudio.showdown.utils.gui.ButtonGui;
 import space.moonstudio.showdown.utils.gui.Gui;
 
@@ -34,6 +35,7 @@ public class ShowdownKitPickGui extends Gui {
         if(event.getCurrentItem().isSimilar(ButtonGui.BACK.get()))
         {
             new ShowdownMenuGui().open((Player) event.getWhoClicked());
+            PlayerConfig.get(event.getWhoClicked().getName()).addMoney(ShowdownManager.JOIN_PRICE);
             return;
         }
 
