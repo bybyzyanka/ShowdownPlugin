@@ -6,7 +6,8 @@ public enum ShowdownMessage {
 
     SUCCESS(ChatColor.GREEN + "[Showdown] Успешно!"),
 
-    JOIN(ChatColor.GREEN + "[Showdown] Вы присоединились к ШД!"),
+    JOIN(ChatColor.GREEN + "[Showdown] " + ChatColor.GOLD + "%nick% " + ChatColor.GREEN + "присоединился к ШД, " +
+        ChatColor.GOLD + "%players" + ChatColor.GREEN + "/" + ChatColor.GOLD + "10"),
 
     CONTAINS_IMPERMISSIBLE_SYMBOLS(ChatColor.RED + "[Showdown] Название содержит запрещенные символы!"),
 

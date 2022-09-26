@@ -1,5 +1,6 @@
 package space.moonstudio.showdown;
 
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -27,8 +28,12 @@ public class ShowdownManager {
     private static List<ShowdownKit> kits = new ArrayList<>();
     private static List<ShowdownMap> maps = new ArrayList<>();
 
-    static
+    @Getter
+    private static boolean isInitialized; // need because worlds load occurs on player join
+
+    public static void initialize()
     {
+        isInitialized = true;
         initializeMaps();
         initializeKits();
     }
@@ -81,7 +86,7 @@ public class ShowdownManager {
                                 section.getDouble("spawn-points." + index + ".y"),
                                 section.getDouble("spawn-points." + index + ".z"));
 
-                        map.getSpawnPoints().setSpawnpoint(index, location);
+                        map.getSpawnPoints().setSpawnPoint(index, location);
                     }
                     catch (Exception exception) { exception.printStackTrace(); }
                 }

@@ -5,12 +5,16 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import space.moonstudio.showdown.ShowdownManager;
 
 public class PlayerConfigListener implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event)
     {
+        if(!ShowdownManager.isInitialized())
+            ShowdownManager.initialize();
+
         PlayerConfig.get(event.getPlayer().getName()).giveItems();
     }
 

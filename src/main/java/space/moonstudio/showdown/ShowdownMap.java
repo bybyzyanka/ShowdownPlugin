@@ -36,6 +36,9 @@ public class ShowdownMap {
     public void addPlayer(String nick, ShowdownKit kit)
     {
         players.add(new ShowdownPlayer(nick, kit));
+        notification(ShowdownMessage.JOIN.toString().replace("%nick%", nick).
+            replace("%players%", String.valueOf(players.size())));
+
         if(getStatus() == ShowdownStatus.NOT_STARTED && players.size() == 5)
             startCount();
     }
