@@ -1,0 +1,6 @@
+coin:
+  name: &6GoldCoins
+  id: magma_cream
+join-price: 20
+kits:
+maps:
