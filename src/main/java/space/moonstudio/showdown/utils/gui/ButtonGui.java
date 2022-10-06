@@ -13,7 +13,8 @@ public enum ButtonGui {
     BACK(Material.BARRIER, ChatColor.YELLOW + "Назад"),
     TAKE_BIDS(ShowdownManager.COIN.getType(), ChatColor.GREEN + "Забрать ставки"),
     JOIN(Material.NETHER_STAR, ChatColor.GREEN + "Начать игру",
-    ChatColor.GRAY + "Для начала игры требуется " + JOIN_PRICE + " " + COIN.getItemMeta().getDisplayName());
+    ChatColor.GRAY + "Для начала игры требуется " + JOIN_PRICE + " " + COIN.getItemMeta().getDisplayName()),
+    LEAVE(Material.BARRIER, ChatColor.RED + "Покинуть игру");
 
     private final ItemStack item;
 

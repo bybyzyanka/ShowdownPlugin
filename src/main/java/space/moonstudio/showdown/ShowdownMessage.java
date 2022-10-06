@@ -6,11 +6,17 @@ public enum ShowdownMessage {
 
     SUCCESS(ChatColor.GREEN + "[Showdown] Успешно!"),
 
+    KIT(ChatColor.AQUA + "[Showdown] Вы выбрали набор %kit%"),
+
     JOIN(ChatColor.GREEN + "[Showdown] " + ChatColor.GOLD + "%nick% " + ChatColor.GREEN + "присоединился к ШД, " +
-        ChatColor.GOLD + "%players" + ChatColor.GREEN + "/" + ChatColor.GOLD + "10"),
+        ChatColor.GOLD + "%players%" + ChatColor.GREEN + "/" + ChatColor.GOLD + "10"),
+
+    LEAVE(ChatColor.GRAY + "[Showdown] " + ChatColor.GOLD + "%nick% " + ChatColor.GRAY + "покинул ШД, " +
+            ChatColor.GOLD + "%players%" + ChatColor.GRAY + "/" + ChatColor.GOLD + "10"),
 
     CONTAINS_IMPERMISSIBLE_SYMBOLS(ChatColor.RED + "[Showdown] Название содержит запрещенные символы!"),
 
+    ALREADY_IN_GAME(ChatColor.RED + "[Showdown] Вы уже находитесь в ШД, чтобы ее покинуть - заберите ставку!"),
     NOT_ENOUGH_MONEY(ChatColor.RED + "[Showdown] Недостаточно денег!"),
 
     KIT_ALREADY_EXISTS(ChatColor.RED + "[Showdown] Кит с таким именем уже существует!"),
@@ -39,8 +45,11 @@ public enum ShowdownMessage {
             ShowdownManager.COIN.getItemMeta().getDisplayName()),
 
     THIRD_PLACE(ChatColor.AQUA + "[Showdown] Игрок " + ChatColor.YELLOW + "%nick%" + ChatColor.AQUA +
-            " занял 2-ое место, его награда составила " + ChatColor.YELLOW + "%money% " +
+            " занял 3-е место, его награда составила " + ChatColor.YELLOW + "%money% " +
             ShowdownManager.COIN.getItemMeta().getDisplayName()),
+
+    OTHER_PLACE(ChatColor.AQUA + "[Showdown] Игрок " + ChatColor.YELLOW + "%nick%" + ChatColor.AQUA +
+            " покидает игру, он занял %place%-е место!"),
 
     NO_WORLDS_AVAILABLE(ChatColor.RED + "[Showdown] Нет доступных миров для начала игры"),
 

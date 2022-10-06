@@ -1,5 +1,6 @@
 package space.moonstudio.showdown.gui;
 
+import com.earth2me.essentials.spawn.IEssentialsSpawn;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import space.moonstudio.showdown.ShowdownManager;
@@ -25,6 +26,12 @@ public class ShowdownMenuGui extends Gui {
         PlayerConfig config = PlayerConfig.get(event.getWhoClicked().getName());
         if(event.getCurrentItem().isSimilar(ButtonGui.JOIN.get()))
         {
+            if(ShowdownManager.getMap(event.getWhoClicked().getName()) != null)
+            {
+                event.getWhoClicked().sendMessage(ShowdownMessage.ALREADY_IN_GAME.toString());
+                return;
+            }
+
             ShowdownMap map = ShowdownManager.getFreeMap();
             if(map == null)
             {
@@ -32,7 +39,7 @@ public class ShowdownMenuGui extends Gui {
                 return;
             }
 
-            if(!config.addMoney(-ShowdownManager.JOIN_PRICE))
+            if(config.getMoney() < ShowdownManager.JOIN_PRICE)
             {
                 event.getWhoClicked().sendMessage(ShowdownMessage.NOT_ENOUGH_MONEY.toString());
                 return;
@@ -41,7 +48,17 @@ public class ShowdownMenuGui extends Gui {
             new ShowdownKitPickGui(map).open((Player) event.getWhoClicked());
         }
         else if(event.getCurrentItem().isSimilar(ButtonGui.TAKE_BIDS.get()))
-            config.takeBids();
+        {
+            ShowdownMap map = ShowdownManager.getMap(event.getWhoClicked().getName());
+            if(map == null)
+                config.takeBids();
+        }
+        else if(event.getCurrentItem().isSimilar(ButtonGui.LEAVE.get()))
+        {
+            ShowdownMap map = ShowdownManager.getMap(event.getWhoClicked().getName());
+            if(map != null)
+                map.removePlayer(event.getWhoClicked().getName(), false);
+        }
     }
 
     @Override
@@ -49,7 +66,9 @@ public class ShowdownMenuGui extends Gui {
     {
         inventory.setItem(template.getSlot(ButtonGui.TAKE_BIDS, inventory.getSize()), ButtonGui.TAKE_BIDS.get());
         inventory.setItem(template.getSlot(ButtonGui.JOIN, inventory.getSize()), ButtonGui.JOIN.get());
-        inventory.setItem(template.getSlot(ButtonGui.BACK, inventory.getSize()), null);
+        if(ShowdownManager.getMap(player.getName()) != null)
+            inventory.setItem(template.getSlot(ButtonGui.BACK, inventory.getSize()), ButtonGui.LEAVE.get());
+
         return true;
     }
 }

@@ -1,12 +1,17 @@
 package space.moonstudio.showdown;
 
+import com.earth2me.essentials.Essentials;
+import com.earth2me.essentials.spawn.EssentialsSpawn;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import space.moonstudio.showdown.utils.item.UtilItem;
 
 import java.util.ArrayList;
@@ -19,25 +24,18 @@ public class ShowdownManager {
     private static final FileConfiguration CONFIG = ShowdownPlugin.getInstance().getConfig();
 
     public static final ItemStack COIN = UtilItem.create(
-            UtilItem.getMaterial(CONFIG.getString("coin.id")),
-            ChatColor.translateAlternateColorCodes('&', CONFIG.getString("coin.name")));
+        UtilItem.getMaterial(CONFIG.getString("coin.id")),
+        CONFIG.getString("coin.name"));
 
     public static final int JOIN_PRICE = CONFIG.getInt("join-price");
     public static final int MAX_PLAYERS = 10;
-
     private static List<ShowdownKit> kits = new ArrayList<>();
     private static List<ShowdownMap> maps = new ArrayList<>();
-
-    @Getter
-    private static boolean isInitialized; // need because worlds load occurs on player join
-
-    public static void initialize()
+    static
     {
-        isInitialized = true;
         initializeMaps();
         initializeKits();
     }
-
     private static void initializeKits()
     {
         try
@@ -52,7 +50,7 @@ public class ShowdownManager {
                 kits.add(new ShowdownKit(name, CONFIG.getItemStack(path + "icon"), items));
             });
         }
-        catch(Exception exception) { exception.printStackTrace(); }
+        catch(Exception exception) {}
     }
 
     private static void initializeMaps()
@@ -94,12 +92,12 @@ public class ShowdownManager {
                 maps.add(map);
             }
         }
-        catch(Exception exception) { exception.printStackTrace(); }
+        catch(Exception exception) {}
     }
 
     public static void createKit(String name, ItemStack icon, Set<ItemStack> items)
     {
-        name = ChatColor.translateAlternateColorCodes('&', name);
+        //name = ChatColor.translateAlternateColorCodes('&', name);
         CONFIG.set("kits." + name + ".icon", icon);
         int index = 0;
         for(ItemStack item : items)
@@ -110,6 +108,14 @@ public class ShowdownManager {
 
         ShowdownPlugin.getInstance().saveConfig();
         kits.add(new ShowdownKit(name, icon, items));
+    }
+
+    public static void prepareForBattle(Player player)
+    {
+        player.setGameMode(GameMode.SURVIVAL);
+        player.setFlying(false);
+        player.setAllowFlight(false);
+        getEssentials().getUser(player).setGodModeEnabled(false);
     }
 
     public static int createMap()
@@ -148,7 +154,7 @@ public class ShowdownManager {
 
     public static boolean isFreeMap(ShowdownMap map)
     {
-        return map.getPlayers().size() < MAX_PLAYERS && map.getStatus() == ShowdownStatus.NOT_STARTED &&
+        return map.getPlayers().size() < MAX_PLAYERS && map.getStatus() != ShowdownStatus.STARTED &&
             map.getBorder().getFirstPosition() != null && map.getBorder().getSecondPosition() != null &&
                 map.getSpawnPoints().getSpawnPoints().size() == 10;
     }
@@ -156,4 +162,24 @@ public class ShowdownManager {
     public static List<ShowdownMap> getMaps() { return maps; }
 
     public static List<ShowdownKit> getKits() { return kits; }
+
+    public static Essentials getEssentials()
+    {
+        Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("Essentials");
+
+        if (plugin == null || !(plugin instanceof Essentials))
+            return null;
+
+        return (Essentials) plugin;
+    }
+
+    public static EssentialsSpawn getEssentialsSpawn()
+    {
+        Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("EssentialsSpawn");
+
+        if (plugin == null || !(plugin instanceof EssentialsSpawn))
+            return null;
+
+        return (EssentialsSpawn) plugin;
+    }
 }

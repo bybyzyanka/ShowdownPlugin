@@ -12,16 +12,13 @@ public class PlayerConfigListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event)
     {
-        if(!ShowdownManager.isInitialized())
-            ShowdownManager.initialize();
-
         PlayerConfig.get(event.getPlayer().getName()).giveItems();
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    /*@EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerRespawn(PlayerRespawnEvent event)
     {
         PlayerConfig.get(event.getPlayer().getName()).restoreInventory();
         PlayerConfig.get(event.getPlayer().getName()).giveItems();
-    }
+    } */
 }

@@ -1,10 +1,11 @@
 name: Showdown
-version: '1.0'
+version: 1.0
 main: space.moonstudio.showdown.ShowdownPlugin
 api-version: 1.16
 authors: [ MoonStudio, byby ]
 description: Showdown by byby (vk.com/kai9595)
 website: https://vk.com/kai9595
+depend: [ Essentials, EssentialsSpawn ]
 commands:
   showdown:
     aliases: shd

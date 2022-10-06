@@ -143,14 +143,15 @@ public class PlayerConfig {
     {
         if(money > 0)
         {
-            while(money > 0)
+            do
             {
                 int amount = money > 64 ? 64 : money;
                 money -= amount;
                 ItemStack item = new ItemStack(ShowdownManager.COIN);
-                item.setAmount(money);
+                item.setAmount(amount);
                 addItem(item);
             }
+            while(money > 0);
 
             return true;
         }

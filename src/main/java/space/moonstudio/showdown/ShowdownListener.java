@@ -1,14 +1,15 @@
 package space.moonstudio.showdown;
 
+import com.earth2me.essentials.spawn.IEssentialsSpawn;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import space.moonstudio.showdown.gui.ShowdownCreateKitGui;
 
 import java.util.Arrays;
@@ -19,9 +20,15 @@ public class ShowdownListener implements Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event)
     {
-        ShowdownMap map = ShowdownManager.getMap(event.getEntity().getName());
-        if(map != null && map.getStatus() == ShowdownStatus.STARTED)
-            map.removePlayer(event.getEntity().getName(), false);
+        Bukkit.getScheduler().runTaskLater(ShowdownPlugin.getInstance(), () ->
+        {
+            ShowdownMap map = ShowdownManager.getMap(event.getEntity().getName());
+            if(map != null && map.getStatus() == ShowdownStatus.STARTED)
+            {
+                event.getEntity().spigot().respawn();
+                map.removePlayer(event.getEntity().getName(), false);
+            }
+        }, 1);
     }
 
     @EventHandler
@@ -30,6 +37,13 @@ public class ShowdownListener implements Listener {
         ShowdownMap map = ShowdownManager.getMap(event.getPlayer().getName());
         if(map != null)
             map.removePlayer(event.getPlayer().getName(), false);
+    }
+
+    @EventHandler
+    public void onGamemodeChange(PlayerGameModeChangeEvent event)
+    {
+        if(event.getNewGameMode() == GameMode.CREATIVE && ShowdownManager.getMap(event.getPlayer().getName()) != null)
+            event.setCancelled(true);
     }
 
     @EventHandler
@@ -46,13 +60,31 @@ public class ShowdownListener implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event)
     {
-        ShowdownMap map = ShowdownManager.getMap(event.getPlayer().getName());
+        Player player = event.getPlayer();
+        ShowdownMap map = ShowdownManager.getMap(player.getName());
         if(map != null && map.getStatus() == ShowdownStatus.STARTED)
         {
+            if(!map.getBorder().isInBorder(event.getFrom()))
+            {
+                map.removePlayer(player.getName(), false);
+                return;
+            }
+
             if(!map.getBorder().isInBorder(event.getTo()))
             {
                 event.setCancelled(true);
-                event.getPlayer().sendMessage(ShowdownMessage.CANT_GO_OUT_OF_BORDER.toString());
+                player.sendMessage(ShowdownMessage.CANT_GO_OUT_OF_BORDER.toString());
+            }
+
+            return;
+        }
+
+        for(ShowdownMap showdownMap : ShowdownManager.getMaps())
+        {
+            if (showdownMap.getStatus() == ShowdownStatus.STARTED && showdownMap.getBorder().isInBorder(event.getTo())) {
+                event.setCancelled(true);
+                player.teleport(((IEssentialsSpawn) ShowdownManager.getEssentialsSpawn()).
+                        getSpawn(ShowdownManager.getEssentials().getUser(player).getGroup()));
             }
         }
     }
@@ -60,6 +92,9 @@ public class ShowdownListener implements Listener {
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent event)
     {
+        if(event.getMessage().startsWith("/showdown") || event.getMessage().startsWith("/shd"))
+            return;
+
         ShowdownMap map = ShowdownManager.getMap(event.getPlayer().getName());
         if(map != null && map.getStatus() == ShowdownStatus.STARTED)
         {
