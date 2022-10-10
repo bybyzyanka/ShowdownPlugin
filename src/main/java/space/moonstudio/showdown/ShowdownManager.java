@@ -1,17 +1,14 @@
 package space.moonstudio.showdown;
 
-import com.earth2me.essentials.Essentials;
-import com.earth2me.essentials.spawn.EssentialsSpawn;
-import lombok.Getter;
+import com.earth2me.essentials.User;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
+import space.moonstudio.showdown.utils.Plugins;
 import space.moonstudio.showdown.utils.item.UtilItem;
 
 import java.util.ArrayList;
@@ -35,7 +32,9 @@ public class ShowdownManager {
     {
         initializeMaps();
         initializeKits();
+        new ShowdownChecker().start();
     }
+
     private static void initializeKits()
     {
         try
@@ -72,7 +71,7 @@ public class ShowdownManager {
 
                         map.getBorder().setPosition(index, location);
                     }
-                    catch (Exception exception) { exception.printStackTrace(); }
+                    catch (Exception exception) {}
                 }
 
                 for (int index = 1; index <= 10; index++)
@@ -86,7 +85,7 @@ public class ShowdownManager {
 
                         map.getSpawnPoints().setSpawnPoint(index, location);
                     }
-                    catch (Exception exception) { exception.printStackTrace(); }
+                    catch (Exception exception) {}
                 }
 
                 maps.add(map);
@@ -108,14 +107,6 @@ public class ShowdownManager {
 
         ShowdownPlugin.getInstance().saveConfig();
         kits.add(new ShowdownKit(name, icon, items));
-    }
-
-    public static void prepareForBattle(Player player)
-    {
-        player.setGameMode(GameMode.SURVIVAL);
-        player.setFlying(false);
-        player.setAllowFlight(false);
-        getEssentials().getUser(player).setGodModeEnabled(false);
     }
 
     public static int createMap()
@@ -159,27 +150,27 @@ public class ShowdownManager {
                 map.getSpawnPoints().getSpawnPoints().size() == 10;
     }
 
+    public static void prepareForBattle(Player player)
+    {
+        if(player.getGameMode() != GameMode.SURVIVAL)
+            player.setGameMode(GameMode.SURVIVAL);
+
+        if(player.isFlying())
+            player.setFlying(false);
+
+        if(player.getAllowFlight())
+            player.setAllowFlight(false);
+
+        User user = Plugins.getEssentials().getUser(player);
+        if(user.isGodModeEnabled())
+            user.setGodModeEnabled(false);
+
+        if(player.getWalkSpeed() > 0.2F)
+            //player.setWalkSpeed(0.2F);
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "speed " + player.getName() + " 1");
+    }
+
     public static List<ShowdownMap> getMaps() { return maps; }
 
     public static List<ShowdownKit> getKits() { return kits; }
-
-    public static Essentials getEssentials()
-    {
-        Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("Essentials");
-
-        if (plugin == null || !(plugin instanceof Essentials))
-            return null;
-
-        return (Essentials) plugin;
-    }
-
-    public static EssentialsSpawn getEssentialsSpawn()
-    {
-        Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("EssentialsSpawn");
-
-        if (plugin == null || !(plugin instanceof EssentialsSpawn))
-            return null;
-
-        return (EssentialsSpawn) plugin;
-    }
 }

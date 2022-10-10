@@ -8,11 +8,17 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import space.moonstudio.showdown.player.PlayerConfig;
+import space.moonstudio.showdown.utils.Plugins;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ShowdownMap {
+
+    private static final int DEFAULT_TIME_LEFT = 180,
+            DEFAULT_PLAYERS_ON_START = 0,
+            DEFAULT_TASK_ID = -1,
+            MIN_PLAYERS = 5;
 
     @Getter
     private final int id;
@@ -23,8 +29,10 @@ public class ShowdownMap {
 
     @Getter
     private List<ShowdownPlayer> players = new ArrayList<>();
-    private int taskId;
+
     private int playersOnStart;
+    private int taskId;
+    private int timeLeft;
 
     public ShowdownMap(int id)
     {
@@ -36,14 +44,14 @@ public class ShowdownMap {
 
     public boolean addPlayer(String nick, ShowdownKit kit)
     {
-        if(getPlayer(nick) != null)
+        if(getPlayer(nick) != null || players.size() >= ShowdownManager.MAX_PLAYERS)
             return false;
 
         players.add(new ShowdownPlayer(nick, kit));
         notification(ShowdownMessage.JOIN.toString().replace("%nick%", nick).
             replace("%players%", String.valueOf(players.size())));
 
-        if(getStatus() == ShowdownStatus.NOT_STARTED && players.size() == 3) // 5
+        if(getStatus() == ShowdownStatus.NOT_STARTED && players.size() == MIN_PLAYERS)
             startCount();
 
         return true;
@@ -54,39 +62,38 @@ public class ShowdownMap {
         if(getPlayer(nick) == null)
             return;
 
-        players.remove(getPlayer(nick));
+        Player player = Bukkit.getPlayer(nick);
         if(getStatus() != ShowdownStatus.STARTED)
+        {
             PlayerConfig.get(nick).addAvailableBid(ShowdownManager.JOIN_PRICE);
+            String message = ShowdownMessage.LEAVE.toString().replace("%nick%", nick).
+                    replace("%players%", String.valueOf(players.size() - 1));
 
+            notification(message);
+        }
+
+        players.remove(getPlayer(nick));
         if(getStatus() != ShowdownStatus.NOT_STARTED)
         {
-            Player player = Bukkit.getPlayer(nick);
             if(getStatus() == ShowdownStatus.STARTED)
             {
-                giveReward(player, players.size() + 1);
+                PlayerConfig.get(nick).restoreInventory();
                 if(player != null)
                 {
-                    PlayerConfig.get(nick).restoreInventory();
-                    player.teleport(((IEssentialsSpawn) ShowdownManager.getEssentialsSpawn()).
-                            getSpawn(ShowdownManager.getEssentials().getUser(player).getGroup()));
+                    player.teleport(((IEssentialsSpawn) Plugins.getEssentialsSpawn()).
+                            getSpawn(Plugins.getEssentials().getUser(player).getGroup()));
                 }
-            }
-            else
-            {
-                String message = ShowdownMessage.LEAVE.toString().replace("%nick%", nick).
-                        replace("%players%", String.valueOf(players.size()));
 
-                notification(message);
-                player.sendMessage(message);
+                giveReward(nick, players.size() + 1);
             }
 
             if(!finish)
-                if((getStatus() == ShowdownStatus.WAITING && players.size() < 5) || players.size() == 1)
+                if((getStatus() == ShowdownStatus.WAITING && players.size() < MIN_PLAYERS) || players.size() == 1)
                     finish();
         }
     }
 
-    private void giveReward(Player player, int place)
+    private void giveReward(String nick, int place)
     {
         String message = ShowdownMessage.OTHER_PLACE.toString();
         double money = place <= 3 ? playersOnStart * ShowdownManager.JOIN_PRICE : 0;
@@ -107,17 +114,18 @@ public class ShowdownMap {
         }
 
         money = Math.round(money);
-        message = message.replace("%nick%", player.getName())
+        message = message.replace("%nick%", nick)
             .replace("%money%", String.valueOf(money)).replace("%place%", String.valueOf(place));
 
         if(place != 1)
             notification(message);
 
+        Player player = Bukkit.getPlayer(nick);
         if(player != null)
             player.sendMessage(message);
 
         if(money > 0.0)
-            PlayerConfig.get(player.getName()).addMoney((int) money);
+            PlayerConfig.get(nick).addMoney((int) money);
     }
 
     private void notification(String message)
@@ -127,82 +135,72 @@ public class ShowdownMap {
 
     public void startCount()
     {
-        taskId = Bukkit.getScheduler().runTaskAsynchronously(ShowdownPlugin.getInstance(), () ->
+        taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(ShowdownPlugin.getInstance(), () ->
         {
-            int timeLeft = 15; //300
-            while(timeLeft > 0)
+            if(timeLeft <= 0)
             {
-                if(timeLeft > 15 && getPlayers().size() == 10)
-                    timeLeft = 15;
-
-                if(timeLeft == 300 || timeLeft == 30 || timeLeft == 15 || timeLeft < 6)
-                {
-                    if (timeLeft % 60 == 0)
-                        notification(ShowdownMessage.GAME_START_MINUTES.toString().replace("%time%", String.valueOf(timeLeft / 60)));
-                    else if (timeLeft <= 30)
-                        notification(ShowdownMessage.GAME_START_SECONDS.toString().replace("%time%", String.valueOf(timeLeft)));
-                }
-
-                try { Thread.sleep(1000); }
-                catch(InterruptedException e) {}
-
-                timeLeft--;
+                startGame();
+                return;
             }
 
-            startGame();
-        }).getTaskId();
+            if(timeLeft > 15 && getPlayers().size() == 10)
+                timeLeft = 15;
+
+            if(timeLeft == DEFAULT_TIME_LEFT || timeLeft == 30 || timeLeft == 15 || timeLeft < 6)
+            {
+                if(timeLeft % 60 == 0)
+                    notification(ShowdownMessage.GAME_START_MINUTES.toString().replace("%time%", String.valueOf(timeLeft / 60)));
+                else if(timeLeft <= 30)
+                    notification(ShowdownMessage.GAME_START_SECONDS.toString().replace("%time%", String.valueOf(timeLeft)));
+            }
+
+            timeLeft--;
+        }, 0, 20);
     }
 
     private void startGame()
     {
+        cancelTask();
         playersOnStart = players.size();
-        Bukkit.getScheduler().runTask(ShowdownPlugin.getInstance(), () ->
+        for (int index = 0; index < playersOnStart; index++)
         {
-            for (int index = 0; index < playersOnStart; index++)
-            {
-                ShowdownPlayer showdownPlayer = players.get(index);
-                Player player = Bukkit.getPlayer(showdownPlayer.getNick());
-                player.teleport(spawnPoints.getSpawnPoints().get(index));
-                ShowdownManager.prepareForBattle(player);
-                showdownPlayer.getKit().give(player);
-                player.sendTitle(ShowdownMessage.GAME_START_TITLE.toString(), ShowdownMessage.GAME_START_SUBTITLE.toString(),
-                        10, 40, 10);
-            }
-        });
+            ShowdownPlayer showdownPlayer = players.get(index);
+            Player player = Bukkit.getPlayer(showdownPlayer.getNick());
+            player.teleport(spawnPoints.getSpawnPoints().get(index));
+            ShowdownManager.prepareForBattle(player);
+            showdownPlayer.getKit().give(player);
+            player.sendTitle(ShowdownMessage.GAME_START_TITLE.toString(), ShowdownMessage.GAME_START_SUBTITLE.toString(),
+                    10, 40, 10);
+        }
 
-        try { Thread.sleep(300000); }
-        catch(Exception exception) {}
-
-        finish();
+        taskId = Bukkit.getScheduler().runTaskLater(ShowdownPlugin.getInstance(), () -> finish(), 6000L).getTaskId();
     }
 
     public void finish()
     {
-        Bukkit.getScheduler().runTask(ShowdownPlugin.getInstance(), () ->
+        if(getStatus() == ShowdownStatus.NOT_STARTED)
+            return;
+
+        cancelTask();
+
+        if(getStatus() == ShowdownStatus.STARTED)
         {
-            if(getStatus() == ShowdownStatus.NOT_STARTED)
-                return;
+            List<ShowdownPlayer> players = new ArrayList<>(this.players);
+            players.forEach(player -> removePlayer(player.getNick(), true));
+        }
+        else if(getStatus() == ShowdownStatus.WAITING)
+            notification(ShowdownMessage.NOT_ENOUGH_PLAYERS.toString());
 
-            if(getStatus() == ShowdownStatus.STARTED)
-            {
-                List<ShowdownPlayer> players = new ArrayList<>(this.players);
-                players.forEach(player -> removePlayer(player.getNick(), true));
-            }
-            else if(getStatus() == ShowdownStatus.WAITING)
-                notification(ShowdownMessage.NOT_ENOUGH_PLAYERS.toString());
-
-            reset();
-        });
+        reset();
     }
 
     public ShowdownStatus getStatus()
     {
-        if(taskId != -1)
-        {
-            if(playersOnStart != 0)
-                return ShowdownStatus.STARTED;
-            else return ShowdownStatus.WAITING;
-        }
+        if(playersOnStart != DEFAULT_PLAYERS_ON_START)
+            return ShowdownStatus.STARTED;
+
+        if(taskId != DEFAULT_TASK_ID)
+            return ShowdownStatus.WAITING;
 
         return ShowdownStatus.NOT_STARTED;
     }
@@ -217,17 +215,18 @@ public class ShowdownMap {
         if(getStatus() == ShowdownStatus.STARTED)
             players = new ArrayList<>();
 
-        playersOnStart = 0;
+        timeLeft = DEFAULT_TIME_LEFT;
+        playersOnStart = DEFAULT_PLAYERS_ON_START;
         cancelTask();
     }
 
     private void cancelTask()
     {
-        if(taskId == -1)
+        if(taskId == DEFAULT_TASK_ID)
             return;
 
         Bukkit.getScheduler().cancelTask(taskId);
-        taskId = -1;
+        taskId = DEFAULT_TASK_ID;
     }
 
     void sync()

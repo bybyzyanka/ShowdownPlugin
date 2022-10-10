@@ -11,6 +11,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.*;
 import space.moonstudio.showdown.gui.ShowdownCreateKitGui;
+import space.moonstudio.showdown.utils.Plugins;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -20,11 +21,12 @@ public class ShowdownListener implements Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event)
     {
-        Bukkit.getScheduler().runTaskLater(ShowdownPlugin.getInstance(), () ->
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ShowdownPlugin.getInstance(), () ->
         {
             ShowdownMap map = ShowdownManager.getMap(event.getEntity().getName());
             if(map != null && map.getStatus() == ShowdownStatus.STARTED)
             {
+                event.getDrops().clear();
                 event.getEntity().spigot().respawn();
                 map.removePlayer(event.getEntity().getName(), false);
             }
@@ -81,10 +83,11 @@ public class ShowdownListener implements Listener {
 
         for(ShowdownMap showdownMap : ShowdownManager.getMaps())
         {
-            if (showdownMap.getStatus() == ShowdownStatus.STARTED && showdownMap.getBorder().isInBorder(event.getTo())) {
+            if(showdownMap.getStatus() == ShowdownStatus.STARTED && showdownMap.getBorder().isInBorder(event.getTo()))
+            {
                 event.setCancelled(true);
-                player.teleport(((IEssentialsSpawn) ShowdownManager.getEssentialsSpawn()).
-                        getSpawn(ShowdownManager.getEssentials().getUser(player).getGroup()));
+                player.teleport(((IEssentialsSpawn) Plugins.getEssentialsSpawn()).
+                        getSpawn(Plugins.getEssentials().getUser(player).getGroup()));
             }
         }
     }

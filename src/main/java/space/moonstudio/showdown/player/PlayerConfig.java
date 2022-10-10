@@ -1,5 +1,6 @@
 package space.moonstudio.showdown.player;
 
+import com.earth2me.essentials.paperlib.PaperLib;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -66,7 +67,7 @@ public class PlayerConfig {
 
     public int getAvailableBids() { return config.getInt(BIDS); }
 
-    public void saveInventory()
+    public synchronized void saveInventory()
     {
         Player player = Bukkit.getPlayer(getNick());
         if(player == null)
@@ -81,7 +82,7 @@ public class PlayerConfig {
         player.getInventory().setContents(new ItemStack[contents.length]);
     }
 
-    public void restoreInventory()
+    public synchronized void restoreInventory()
     {
         Player player = Bukkit.getPlayer(getNick());
         if(player == null)
@@ -104,7 +105,7 @@ public class PlayerConfig {
         saveConfig();
     }
 
-    public void giveItems()
+    public synchronized void giveItems()
     {
         Player player = Bukkit.getPlayer(getNick());
         if(player == null)
@@ -139,7 +140,7 @@ public class PlayerConfig {
         saveConfig();
     }
 
-    public boolean addMoney(int money)
+    public synchronized boolean addMoney(int money)
     {
         if(money > 0)
         {

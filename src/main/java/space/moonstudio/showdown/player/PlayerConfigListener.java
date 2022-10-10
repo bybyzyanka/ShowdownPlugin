@@ -1,5 +1,6 @@
 package space.moonstudio.showdown.player;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -12,13 +13,19 @@ public class PlayerConfigListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event)
     {
-        PlayerConfig.get(event.getPlayer().getName()).giveItems();
+        giveItems(event.getPlayer());
     }
 
-    /*@EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerRespawn(PlayerRespawnEvent event)
     {
-        PlayerConfig.get(event.getPlayer().getName()).restoreInventory();
-        PlayerConfig.get(event.getPlayer().getName()).giveItems();
-    } */
+        giveItems(event.getPlayer());
+    }
+
+    private void giveItems(Player player)
+    {
+        PlayerConfig config = PlayerConfig.get(player.getName());
+        config.restoreInventory();
+        config.giveItems();
+    }
 }

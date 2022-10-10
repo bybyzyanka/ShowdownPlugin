@@ -12,7 +12,7 @@ public enum ShowdownMessage {
         ChatColor.GOLD + "%players%" + ChatColor.GREEN + "/" + ChatColor.GOLD + "10"),
 
     LEAVE(ChatColor.GRAY + "[Showdown] " + ChatColor.GOLD + "%nick% " + ChatColor.GRAY + "покинул ШД, " +
-            ChatColor.GOLD + "%players%" + ChatColor.GRAY + "/" + ChatColor.GOLD + "10"),
+        ChatColor.GOLD + "%players%" + ChatColor.GRAY + "/" + ChatColor.GOLD + "10"),
 
     CONTAINS_IMPERMISSIBLE_SYMBOLS(ChatColor.RED + "[Showdown] Название содержит запрещенные символы!"),
 
@@ -27,7 +27,7 @@ public enum ShowdownMessage {
 
     GAME_START_TITLE(ChatColor.GREEN + "ШД началось!"),
 
-    GAME_START_SUBTITLE(ChatColor.AQUA + "Осталось " + ChatColor.GOLD + "5 " + ChatColor.AQUA + "минут до конца"),
+    GAME_START_SUBTITLE(ChatColor.AQUA + "Осталось " + ChatColor.GOLD + "3 " + ChatColor.AQUA + "минуты до конца"),
 
     NOT_ENOUGH_PLAYERS(ChatColor.RED + "[Showdown] Недостаточно игроков для начала игры"),
 

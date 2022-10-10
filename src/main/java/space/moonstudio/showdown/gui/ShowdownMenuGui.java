@@ -66,8 +66,8 @@ public class ShowdownMenuGui extends Gui {
     {
         inventory.setItem(template.getSlot(ButtonGui.TAKE_BIDS, inventory.getSize()), ButtonGui.TAKE_BIDS.get());
         inventory.setItem(template.getSlot(ButtonGui.JOIN, inventory.getSize()), ButtonGui.JOIN.get());
-        if(ShowdownManager.getMap(player.getName()) != null)
-            inventory.setItem(template.getSlot(ButtonGui.BACK, inventory.getSize()), ButtonGui.LEAVE.get());
+        inventory.setItem(template.getSlot(ButtonGui.BACK, inventory.getSize()), ShowdownManager.
+                getMap(player.getName()) != null ? ButtonGui.LEAVE.get() : null);
 
         return true;
     }

@@ -4,3 +4,12 @@ coin:
 join-price: 20
 kits:
 maps:
+messages:
+  SUCCESS: '§a[Showdown] Успешно!'
+  KIT: '§b[Showdown] Вы выбрали набор %kit%'
+  JOIN: '§a[Showdown] §6%nick% §aприсоединился к ШД, §6%players% §a/§610'
+  LEAVE: '§7[Showdown] §6%nick% §7покинул ШД, §6%players% §7/§610'
+  CONTAINS_IMPERMISSIBLE_SYMBOLS: '§c[Showdown] Название содержит запрещенные символы!'
+  ALREADY_IN_GAME: '§c[Showdown] Вы уже находитесь в ШД, пропишите /shd для того чтобы покинуть игру!'
+  NOT_ENOUGH_MONEY: '§c[Showdown] У вас недостаточно денег!'
+  KIT_ALREADY_EXISTS: '§c[Showdown] Кит с таким именем уже существует!'
