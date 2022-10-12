@@ -15,10 +15,10 @@ import java.util.List;
 
 public class ShowdownMap {
 
-    private static final int DEFAULT_TIME_LEFT = 180,
+    private static final int DEFAULT_TIME_LEFT,
             DEFAULT_PLAYERS_ON_START = 0,
             DEFAULT_TASK_ID = -1,
-            MIN_PLAYERS = 5;
+            MIN_PLAYERS;
 
     @Getter
     private final int id;
@@ -33,6 +33,12 @@ public class ShowdownMap {
     private int playersOnStart;
     private int taskId;
     private int timeLeft;
+
+    static
+    {
+        DEFAULT_TIME_LEFT = ShowdownPlugin.getInstance().getConfig().getInt("showdown-duration-in-seconds");
+        MIN_PLAYERS = ShowdownPlugin.getInstance().getConfig().getInt("min-players");
+    }
 
     public ShowdownMap(int id)
     {
@@ -115,7 +121,8 @@ public class ShowdownMap {
 
         money = Math.round(money);
         message = message.replace("%nick%", nick)
-            .replace("%money%", String.valueOf(money)).replace("%place%", String.valueOf(place));
+            .replace("%money%", String.valueOf(money)).replace("%place%", String.valueOf(place))
+                .replace("%coin%", ShowdownManager.COIN.getItemMeta().getDisplayName());
 
         if(place != 1)
             notification(message);

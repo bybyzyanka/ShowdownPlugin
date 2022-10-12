@@ -2,6 +2,8 @@ coin:
   name: '§6GoldCoins'
   id: magma_cream
 join-price: 20
+showdown-duration-in-seconds: 180
+min-players: 5
 kits:
 maps:
 messages:
@@ -13,3 +15,26 @@ messages:
   ALREADY_IN_GAME: '§c[Showdown] Вы уже находитесь в ШД, пропишите /shd для того чтобы покинуть игру!'
   NOT_ENOUGH_MONEY: '§c[Showdown] У вас недостаточно денег!'
   KIT_ALREADY_EXISTS: '§c[Showdown] Кит с таким именем уже существует!'
+  GAME_START_MINUTES: '§2[Showdown] Игра начнется через %time% минут(ы)'
+  GAME_START_SECONDS: '§2[Showdown] Игра начнется через %time% секунд(ы)'
+  GAME_START_TITLE: '§2ШД началось!'
+  GAME_START_SUBTITLE: '§bОсталось §63 §bминуты до конца'
+  NOT_ENOUGH_PLAYERS: '§c[Showdown] Недостаточно игроков для начала игры'
+  CANT_USE_COMMANDS: '§c[Showdown] Вы не можете использовать команды во время игры!'
+  CREATE_MAP: '§a[Showdown] Карта создана! Ее ID: §6%id%'
+  TAKE_ITEM_IN_HAND: '§c[Showdown] [Showdown] Возьмите предмет в руку, он будет использоваться как иконка для набора!'
+  FIRST_PLACE: '§b[Showdown] Вы заняли 1-ое место, ваша награда - §e%money% %coin%'
+  SECOND_PLACE: '§b[Showdown] Игрок §e%nick% §bзанял 2-ое место, его награда составила §e%money% %coin%'
+  THIRD_PLACE: '§b[Showdown] Игрок §e%nick% §bзанял 3-е место, его награда составила §e%money% %coin%'
+  OTHER_PLACE: '§b[Showdown] Игрок §e%nick%" §bпокидает игру, он занял %place%-е место!'
+  NO_WORLDS_AVAILABLE: '§c[Showdown] Нет доступных миров для начала игры'
+  CANT_GO_OUT_OF_BORDER: '§c[Showdown] Нельзя выйти за пределы карты'
+  MAP_WITH_THIS_ID_NOT_FOUND: '§c[Showdown] Карта с таким ID не найдена'
+  HELP_1: '§d[Showdown] Список команд:'
+  HELP_2: '§d[Showdown] /shd help - Показать список команд'
+  HELP_3: '§d[Showdown] /shd create kit <название> - Создать новый набор предметов'
+  HELP_4: '§d[Showdown] /shd create map - Создать новую карту'
+  HELP_5: '§d[Showdown] /shd set spawnpoint <номер карты> <номер точки от 1 до 10> - Установить точку спавна на карте'
+  HELP_6: '§d[Showdown] /shd set border <номер карты> <номер точки от 1 до 2> - Установить точки границы карты'
+  HELP_7: '§dПРИМЕЧАНИЕ: Карта не будет считаться играбельной до " +
+            "установки всех 10-ти точек спавна и 2-х точек границ'
