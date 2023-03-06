@@ -1,8 +1,8 @@
 package space.moonstudio.showdown.player;
 
-import com.earth2me.essentials.paperlib.PaperLib;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import space.moonstudio.showdown.ShowdownManager;
 import space.moonstudio.showdown.ShowdownPlugin;
+import space.moonstudio.showdown.utils.PlayerUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -50,11 +51,11 @@ public class PlayerConfig {
 
     public void takeBids()
     {
-        Player player = Bukkit.getPlayer(nick);
+        Player player = PlayerUtil.getPlayer(nick);
         if(player == null)
             return;
 
-        addMoney(getAvailableBids());
+        addMoney(getAvailableBids(), true);
         config.set(BIDS, 0);
         saveConfig();
     }
@@ -69,12 +70,17 @@ public class PlayerConfig {
 
     public synchronized void saveInventory()
     {
-        Player player = Bukkit.getPlayer(getNick());
+        Player player = PlayerUtil.getPlayer(getNick());
         if(player == null)
             return;
 
         resetSavedInventory();
         ItemStack[] contents = player.getInventory().getContents();
+        if(isEmpty(contents)) {
+            contents = new ItemStack[41];
+            contents[0] = new ItemStack(Material.AIR);
+        }
+
         for(int index = 0; index < contents.length; index++)
             config.set(INVENTORY + "." + index, contents[index]);
 
@@ -82,21 +88,38 @@ public class PlayerConfig {
         player.getInventory().setContents(new ItemStack[contents.length]);
     }
 
+    private boolean isEmpty(ItemStack[] contents)
+    {
+        if(contents != null) {
+            for (ItemStack item : contents) {
+                if (item != null) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     public synchronized void restoreInventory()
     {
-        Player player = Bukkit.getPlayer(getNick());
-        if(player == null)
+        Player player = PlayerUtil.getPlayer(getNick());
+        if(player == null) {
             return;
+        }
 
         ConfigurationSection section = config.getConfigurationSection(INVENTORY);
-        if(section == null)
+        if(section == null) {
             return;
+        }
 
         ItemStack[] items = new ItemStack[41];
-        for(String index : section.getKeys(false))
+        for(String index : section.getKeys(false)) {
             items[Integer.parseInt(index)] = section.getItemStack(index);
+        }
 
         player.getInventory().setContents(items);
+        resetSavedInventory();
     }
 
     private void resetSavedInventory()
@@ -107,7 +130,7 @@ public class PlayerConfig {
 
     public synchronized void giveItems()
     {
-        Player player = Bukkit.getPlayer(getNick());
+        Player player = PlayerUtil.getPlayer(getNick());
         if(player == null)
             return;
 
@@ -122,13 +145,14 @@ public class PlayerConfig {
         saveConfig();
     }
 
-    public void addItem(ItemStack item)
+    public void addItem(ItemStack item, boolean giveImmediately)
     {
-        Player player = Bukkit.getPlayer(getNick());
-        if(player != null)
-        {
-            player.getInventory().addItem(item);
-            return;
+        if(giveImmediately) {
+            Player player = PlayerUtil.getPlayer(getNick());
+            if (player != null) {
+                player.getInventory().addItem(item);
+                return;
+            }
         }
 
         ConfigurationSection section = config.getConfigurationSection(ITEMS);
@@ -140,7 +164,7 @@ public class PlayerConfig {
         saveConfig();
     }
 
-    public synchronized boolean addMoney(int money)
+    public synchronized boolean addMoney(int money, boolean giveImmediately)
     {
         if(money > 0)
         {
@@ -150,14 +174,14 @@ public class PlayerConfig {
                 money -= amount;
                 ItemStack item = new ItemStack(ShowdownManager.COIN);
                 item.setAmount(amount);
-                addItem(item);
+                addItem(item, giveImmediately);
             }
             while(money > 0);
 
             return true;
         }
 
-        Player player = Bukkit.getPlayer(getNick());
+        Player player = PlayerUtil.getPlayer(getNick());
         if(player == null)
             return false;
 
@@ -197,7 +221,7 @@ public class PlayerConfig {
     public int getMoney()
     {
         int money = 0;
-        Player player = Bukkit.getPlayer(getNick());
+        Player player = PlayerUtil.getPlayer(getNick());
         if(player == null)
             return money;
 

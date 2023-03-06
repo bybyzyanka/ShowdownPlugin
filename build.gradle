@@ -16,10 +16,15 @@ repositories {
         name = 'sonatype'
         url = 'https://oss.sonatype.org/content/groups/public/'
     }
+    maven {
+        name = 'destroystokyo-repo'
+        url = 'https://repo.destroystokyo.com/repository/maven-public/'
+    }
 }
 
 dependencies {
     compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
+    //compileOnly "com.destroystokyo.paper:paper-api:1.12.2-R0.1-SNAPSHOT"
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
     implementation fileTree(dir: 'D://Projects/Orders/Java/ShowdownPlugin/src/main/libs', include: ['*.jar'])

@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import space.moonstudio.showdown.player.PlayerConfig;
+import space.moonstudio.showdown.utils.PlayerUtil;
 import space.moonstudio.showdown.utils.Plugins;
 
 import java.util.ArrayList;
@@ -63,12 +64,12 @@ public class ShowdownMap {
         return true;
     }
 
-    public void removePlayer(String nick, boolean finish)
+    public void removePlayer(String nick, boolean finish, boolean leave)
     {
         if(getPlayer(nick) == null)
             return;
 
-        Player player = Bukkit.getPlayer(nick);
+        Player player = PlayerUtil.getPlayer(nick);
         if(getStatus() != ShowdownStatus.STARTED)
         {
             PlayerConfig.get(nick).addAvailableBid(ShowdownManager.JOIN_PRICE);
@@ -83,7 +84,10 @@ public class ShowdownMap {
         {
             if(getStatus() == ShowdownStatus.STARTED)
             {
-                PlayerConfig.get(nick).restoreInventory();
+                if(!leave) {
+                    PlayerConfig.get(nick).restoreInventory();
+                }
+
                 if(player != null)
                 {
                     player.teleport(((IEssentialsSpawn) Plugins.getEssentialsSpawn()).
@@ -127,17 +131,17 @@ public class ShowdownMap {
         if(place != 1)
             notification(message);
 
-        Player player = Bukkit.getPlayer(nick);
+        Player player = PlayerUtil.getPlayer(nick);
         if(player != null)
             player.sendMessage(message);
 
-        if(money > 0.0)
-            PlayerConfig.get(nick).addMoney((int) money);
+        if(money > 0.0D)
+            PlayerConfig.get(nick).addMoney((int) money, place > 1 ? false : true);
     }
 
     private void notification(String message)
     {
-        players.forEach(showdownPlayer -> Bukkit.getPlayer(showdownPlayer.getNick()).sendMessage(message));
+        players.forEach(showdownPlayer -> PlayerUtil.getPlayer(showdownPlayer.getNick()).sendMessage(message));
     }
 
     public void startCount()
@@ -172,7 +176,7 @@ public class ShowdownMap {
         for (int index = 0; index < playersOnStart; index++)
         {
             ShowdownPlayer showdownPlayer = players.get(index);
-            Player player = Bukkit.getPlayer(showdownPlayer.getNick());
+            Player player = PlayerUtil.getPlayer(showdownPlayer.getNick());
             player.teleport(spawnPoints.getSpawnPoints().get(index));
             ShowdownManager.prepareForBattle(player);
             showdownPlayer.getKit().give(player);
@@ -193,7 +197,7 @@ public class ShowdownMap {
         if(getStatus() == ShowdownStatus.STARTED)
         {
             List<ShowdownPlayer> players = new ArrayList<>(this.players);
-            players.forEach(player -> removePlayer(player.getNick(), true));
+            players.forEach(player -> removePlayer(player.getNick(), true, false));
         }
         else if(getStatus() == ShowdownStatus.WAITING)
             notification(ShowdownMessage.NOT_ENOUGH_PLAYERS.toString());

@@ -40,7 +40,7 @@ public class ShowdownKitPickGui extends Gui {
             return;
 
         String nick = event.getWhoClicked().getName();
-        if(!PlayerConfig.get(nick).addMoney(-ShowdownManager.JOIN_PRICE))
+        if(!PlayerConfig.get(nick).addMoney(-ShowdownManager.JOIN_PRICE, true))
         {
             event.getWhoClicked().sendMessage(ShowdownMessage.NOT_ENOUGH_MONEY.toString());
             return;

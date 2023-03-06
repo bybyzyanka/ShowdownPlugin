@@ -1,6 +1,7 @@
 package space.moonstudio.showdown;
 
 import org.bukkit.Bukkit;
+import space.moonstudio.showdown.utils.PlayerUtil;
 
 public class ShowdownChecker {
 
@@ -10,7 +11,7 @@ public class ShowdownChecker {
         {
             ShowdownManager.getMaps().stream().filter(map -> map.getStatus() == ShowdownStatus.STARTED).forEach(map ->
                 map.getPlayers().stream().forEach(value -> ShowdownManager
-                        .prepareForBattle(Bukkit.getPlayer(value.getNick()))));
+                        .prepareForBattle(PlayerUtil.getPlayer(value.getNick()))));
         }, 0, 20L);
     }
 }

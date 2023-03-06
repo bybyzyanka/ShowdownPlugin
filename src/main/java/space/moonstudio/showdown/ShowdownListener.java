@@ -27,8 +27,8 @@ public class ShowdownListener implements Listener {
             if(map != null && map.getStatus() == ShowdownStatus.STARTED)
             {
                 event.getDrops().clear();
+                map.removePlayer(event.getEntity().getName(), false, true);
                 event.getEntity().spigot().respawn();
-                map.removePlayer(event.getEntity().getName(), false);
             }
         }, 1);
     }
@@ -38,7 +38,7 @@ public class ShowdownListener implements Listener {
     {
         ShowdownMap map = ShowdownManager.getMap(event.getPlayer().getName());
         if(map != null)
-            map.removePlayer(event.getPlayer().getName(), false);
+            map.removePlayer(event.getPlayer().getName(), false, true);
     }
 
     @EventHandler
@@ -68,7 +68,7 @@ public class ShowdownListener implements Listener {
         {
             if(!map.getBorder().isInBorder(event.getFrom()))
             {
-                map.removePlayer(player.getName(), false);
+                map.removePlayer(player.getName(), false, false);
                 return;
             }
 

@@ -32,7 +32,9 @@ public class ShowdownKit {
         {
             PlayerInventory inventory = player.getInventory();
             String name = item.getType().name();
-            if(name.endsWith("_HELMET") || item.getType() == Material.PLAYER_HEAD)
+            if(name.endsWith("_HELMET") ||
+                    (item.getType().name().equalsIgnoreCase("PLAYER_HEAD")) ||
+                    (item.getType().name().equalsIgnoreCase("SKULL_ITEM")))
                 inventory.setHelmet(item);
             else if(name.endsWith("_CHESTPLATE"))
                 inventory.setChestplate(item);

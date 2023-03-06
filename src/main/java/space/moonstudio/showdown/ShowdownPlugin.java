@@ -1,5 +1,6 @@
 package space.moonstudio.showdown;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,6 +21,7 @@ public final class ShowdownPlugin extends JavaPlugin {
     {
         instance = this;
         initializeConfig();
+        ShowdownManager.init();
         registerCommands();
         registerListeners();
     }

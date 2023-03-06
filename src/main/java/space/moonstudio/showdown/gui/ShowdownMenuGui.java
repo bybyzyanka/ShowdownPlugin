@@ -57,7 +57,7 @@ public class ShowdownMenuGui extends Gui {
         {
             ShowdownMap map = ShowdownManager.getMap(event.getWhoClicked().getName());
             if(map != null)
-                map.removePlayer(event.getWhoClicked().getName(), false);
+                map.removePlayer(event.getWhoClicked().getName(), false, false);
         }
     }
 

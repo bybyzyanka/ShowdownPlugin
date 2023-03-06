@@ -28,8 +28,15 @@ public class ShowdownManager {
     public static final int MAX_PLAYERS = 10;
     private static List<ShowdownKit> kits = new ArrayList<>();
     private static List<ShowdownMap> maps = new ArrayList<>();
-    static
+
+    /*static
     {
+        initializeMaps();
+        initializeKits();
+        new ShowdownChecker().start();
+    } */
+
+    public static void init() {
         initializeMaps();
         initializeKits();
         new ShowdownChecker().start();
